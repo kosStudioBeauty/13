@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления ботом</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: url('FrierenBg.png') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+        .sidebar {
+            width: 0;
+            position: fixed;
+            height: 100%;
+            background: url('FrierenBg1.jpg') no-repeat center center / cover;
+            overflow-x: hidden;
+            transition: 0.3s;
+            padding-top: 60px;
+            padding-bottom: 60px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+            z-index: -1;
+        }
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+        .sidebar a:hover {
+            background: rgba(87, 87, 87, 0.7);
+            border-radius: 5px;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 1);
+        }
+        .open-btn, .close-btn {
+            font-size: 18px;
+            cursor: pointer;
+            background: #333;
+            color: white;
+            padding: 10px;
+            border: none;
+            position: fixed;
+            z-index: 1;
+        }
+        .open-btn {
+            top: 10px;
+            left: 10px;
+        }
+        .close-btn {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+        }
+        .main-content {
+            margin-left: 0;
+            transition: margin-left 0.3s;
+            padding: 20px;
+            flex-grow: 1;
+        }
+        .section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .section.active {
+            display: block;
+            opacity: 1;
+        }
+        h1, h2 {
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+        }
+        input[type="text"], button {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background: #555;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #777;
+        }
+    </style>
+</head>
+<body>
+    <button class="open-btn" onclick="toggleMenu()">☰ Меню</button>
+    <div class="sidebar" id="sidebar">
+        <a href="#" onclick="showSection('settings')">Настройки</a>
+        <a href="#" onclick="showSection('logs')">Логи</a>
+        <a href="#" onclick="showSection('commands')">Команды</a>
+        <a href="#" onclick="showSection('musicSettings')">Настройка музыки</a>
+        <a href="#" onclick="showSection('giveaways')">Настройка розыгрышей</a>
+        <button class="close-btn" onclick="toggleMenu()">✖ Закрыть</button>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <h1 id="serverName">Панель управления</h1>
+
+        <div id="settings" class="section">
+            <h2>Настройки</h2>
+            <label>Сообщение приветствия:</label>
+            <input type="text" id="welcomeMessage" placeholder="Введите сообщение">
+            <button onclick="saveSetting('welcomeMessage')">Сохранить</button>
+        </div>
+
+        <div id="logs" class="section">
+            <h2>Логи</h2>
+            <p>Здесь будут отображаться последние действия бота.</p>
+        </div>
+
+        <div id="commands" class="section">
+            <h2>Команды</h2>
+            <p>Список доступных команд для бота.</p>
+        </div>
+
+        <div id="musicSettings" class="section">
+            <h2>Настройка музыки</h2>
+            <label>Включить музыку:</label>
+            <input type="checkbox" id="musicEnabled">
+            <label>Выберите плейлист:</label>
+            <input type="text" id="playlistName" placeholder="Название плейлиста">
+            <button onclick="saveSetting('musicEnabled')">Сохранить</button>
+        </div>
+
+        <div id="giveaways" class="section">
+            <h2>Настройка розыгрышей</h2>
+            <label>Название розыгрыша:</label>
+            <input type="text" id="giveawayName" placeholder="Введите название">
+            <label>Количество победителей:</label>
+            <input type="number" id="winnersCount" placeholder="Введите число">
+            <button onclick="saveSetting('giveawayName')">Сохранить</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const sidebar = document.getElementById("sidebar");
+            const mainContent = document.getElementById("mainContent");
+            const closeButton = document.querySelector(".close-btn");
+            
+            if (sidebar.style.width === "250px") {
+                sidebar.style.width = "0";
+                mainContent.style.marginLeft = "0";
+                closeButton.style.display = "none";
+            } else {
+                sidebar.style.width = "250px";
+                mainContent.style.marginLeft = "250px";
+                closeButton.style.display = "block";
+            }
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function saveSetting(settingId) {
+            const value = document.getElementById(settingId).value;
+            alert(`Настройка сохранена: ${value}`);
+        }
+
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            const serverId = params.get('server_id');
+            document.getElementById('serverName').textContent = `Управление сервером: ${serverId}`;
+        }
+        function saveWelcomeSettings() {
+            const channelId = document.getElementById("welcomeChannel").value;
+            const text = document.getElementById("welcomeMessage").value;
+            const image = document.getElementById("welcomeImage").value;
+            const enabled = document.getElementById("welcomeEnabled").checked;
+
+            fetch("http://127.0.0.1:5000/update_welcome_settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    channel_id: channelId,
+                    text: text,
+                    image: image,
+                    enabled: enabled
+                })
+            })
+            .then(response => response.json())
+            .then(data => alert("✅ Настройки обновлены!"))
+            .catch(error => alert("❌ Ошибка: " + error));
+        }
+    </script>
+</body>
+</html>
